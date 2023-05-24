@@ -1,0 +1,29 @@
+name: Deploy test
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [18.x]
+        # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
+
+    steps:
+    - uses: actions/checkout@v3
+    - name: Sync files to server
+      uses: burnett01/rsync-deployments@5.1
+      with:
+        switches: -avzr --delete
+        path: ./*
+        remote_path: /root/testcicd
+        remote_host: ${{ secrets.REMOTE_HOST }}
+        remote_user: root
+        remote_key: ${{ secrets.SSHKEY_SERVER_TEST }}
